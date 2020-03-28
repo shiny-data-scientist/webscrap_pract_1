@@ -46,7 +46,7 @@ def webscraping():
         open('../data/' + name + '.pdf', 'wb').write(file.content)
         # extraemos el contenido del pdf
         contenido_pdf = tabula.read_pdf(
-            '../data/' + name + '.pdf', pages='all', output_format='json'
+            '../data/' + name + '.pdf', pages='all', output_format='json', silent=True
         )
 
         comunidades = ['Andalucía', 'Aragón', 'Asturias', 'Baleares',
@@ -83,18 +83,9 @@ def webscraping():
 
                         # a veces tenemos los datos separados por espacios
                         # o en el siguiente diccionario, para extraerlos,
-                        # generamos dos pattern para usar regular expression.
-                        pattern_casos_separados = r'[0-9]+'
+                        # generamos un pattern para usar regular expression.
                         pattern_casos_juntos = r'[0-9]+\s[0-9]+'
-                        if re.match(pattern_casos_separados,
-                                    level_1_element[i + 1]['text']):
-                            comunidad['casos'] = level_1_element[i + 1]['text']
-                            try:
-                                comunidad['casos_notificados'] = level_1_element[i + 2]['text']
-                            except:
-                                print(level_1_element)
-
-                        elif re.match(pattern_casos_juntos,
+                        if re.match(pattern_casos_juntos,
                                       level_1_element[i + 1]['text']):
                             comunidad['casos'] = level_1_element[
                                 i + 1]['text'].split(' ')[0]
@@ -102,11 +93,20 @@ def webscraping():
                             comunidad['casos_notificados'] = level_1_element[
                                 i + 1]['text'].split(' ')[1]
 
+                        else :
+                            comunidad['casos'] = level_1_element[i + 1]['text']
+                            try:
+                                comunidad['casos_notificados'] = level_1_element[i + 2]['text']
+                            except:
+                                print(level_1_element)
+
+
+
                         comunidad['datetime'] = timestamp
                         datos_interes.append(comunidad)
 
     datos_dataframe = pd.DataFrame(datos_interes)
-    datos_dataframe.to_csv('../data/dataframe.csv')
+    datos_dataframe.to_csv('../data/dataframe.csv', encoding='latin1', index=False)
 
 if __name__ == '__main__':
     webscraping()

@@ -2,3 +2,5 @@
 /venv/
 # pycharm project conf
 /.idea/
+# notebook cache
+/notebooks/.ipynb_checkpoints/

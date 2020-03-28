@@ -5,9 +5,27 @@ import pandas as pd
 import re
 import requests
 import tabula
+import tempfile
+import os
+import shutil
 
-def webscraping():
+def webscraping(output_path_dataframe: str = None, output_path_pdfs: str = None):
+    """
+    Realiza web scraping en la página objetivo para descargar los pdfs,
+    luego realiza pdf scrapping para extraer los datos deseados.
+    :param output_path_dataframe: Path de salida del dataframe
+    :param output_path_pdfs: Path para guardar los pdfs, si no,
+    se eliminan después de extraer los datos.
+    """
     # Descargamos la página objetivo
+
+    using_tmp_dir = output_path_pdfs is None
+
+    if output_path_pdfs is None:
+        output_path_pdfs = tempfile.mkdtemp(dir='../data/')
+
+    output_path_dataframe = output_path_dataframe or '../data/'
+
     page = requests.get(
         'https://www.isciii.es/QueHacemos/Servicios/VigilanciaSaludPublicaRENAVE/'
         'EnfermedadesTransmisibles/Paginas/InformesCOVID-19.aspx'
@@ -18,7 +36,7 @@ def webscraping():
         print(f'Error al descargar la página status_code {page.status_code}')
         return None
 
-    # creamos la sopa a traves de la página
+    # creamos la sopa html
     soup = BeautifulSoup(page.content, features="html.parser")
 
     # buscamos bajo el id donde están los links de interés
@@ -34,19 +52,23 @@ def webscraping():
             pdf['info'] = a_tag.text
             pdfs.append(pdf)
 
+    # completamos los enlaces añadiendo el baselink https://www.isciii.es
     baselink = 'https://www.isciii.es'
     for pdf in pdfs:
         link = pdf['link']
         pdf.update({'link': baselink + link})
+
+    # realizamos el proceso de pdf scrapping para recolectar los datos objetivo
     datos_interes = []
     for pdf in pdfs:
         name = pdf['info']
         url = pdf['link']
+        # descargamos el pdf
         file = requests.get(url, allow_redirects=True)
-        open('../data/' + name + '.pdf', 'wb').write(file.content)
+        open(output_path_pdfs + '/' + name + '.pdf', 'wb').write(file.content)
         # extraemos el contenido del pdf
         contenido_pdf = tabula.read_pdf(
-            '../data/' + name + '.pdf', pages='all', output_format='json', silent=True
+            output_path_pdfs + '/' + name + '.pdf', pages='all', output_format='json', silent=True
         )
 
         comunidades = ['Andalucía', 'Aragón', 'Asturias', 'Baleares',
@@ -74,6 +96,7 @@ def webscraping():
             '%d-%m-%Y'
         )
 
+        # buscamos dentro del pdf los datos de interés
         for top_level_element in contenido_pdf:
             for level_1_element in top_level_element['data']:
                 comunidad = {}
@@ -95,18 +118,20 @@ def webscraping():
 
                         else :
                             comunidad['casos'] = level_1_element[i + 1]['text']
-                            try:
-                                comunidad['casos_notificados'] = level_1_element[i + 2]['text']
-                            except:
-                                print(level_1_element)
-
-
+                            comunidad['casos_notificados'] = level_1_element[i + 2]['text']
 
                         comunidad['datetime'] = timestamp
                         datos_interes.append(comunidad)
 
     datos_dataframe = pd.DataFrame(datos_interes)
-    datos_dataframe.to_csv('../data/dataframe.csv', encoding='latin1', index=False)
+    datos_dataframe.to_csv(
+        output_path_dataframe + 'casos_covid19.csv',
+        encoding='latin1',
+        index=False
+    )
+
+    if using_tmp_dir and os.path.exists(output_path_pdfs):
+        shutil.rmtree(output_path_pdfs)
 
 if __name__ == '__main__':
     webscraping()

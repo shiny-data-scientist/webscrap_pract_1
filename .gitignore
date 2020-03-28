@@ -1,0 +1,4 @@
+# virutal environment
+/venv/
+# pycharm project conf
+/.idea/

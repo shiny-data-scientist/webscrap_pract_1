@@ -34,3 +34,15 @@ $ python scripts/script_webscrapping.py
 El notebook que utiliza selenium necesita tener el driver en el directiorio de notebooks.
 Puedes descargarlo en el siguiente enlace:
     https://chromedriver.chromium.org/
+    
+# Tareas
+
+[x] Análisis páginas y primera extracción
+
+[x] Script página gobierno
+
+[ ] Analizar los links a usar para las diferentes comunidades o ciudades (para extraer datos de contaminación)
+
+[ ] Script que extraiga de forma automática las páginas de todas las comunidades autonómas y/o ciudades.
+
+[ ] Integrar los datos de la contaminación de las dos partículas

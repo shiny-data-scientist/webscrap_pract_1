@@ -28,3 +28,9 @@ Ahora puedes ejecutar jupyter en local o simplemente probar el script en la carp
 ````shell script
 $ python scripts/script_webscrapping.py
 ````
+
+# Ejecutando notebook con selenium
+
+El notebook que utiliza selenium necesita tener el driver en el directiorio de notebooks.
+Puedes descargarlo en el siguiente enlace:
+    https://chromedriver.chromium.org/

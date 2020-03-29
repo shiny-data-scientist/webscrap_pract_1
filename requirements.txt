@@ -1,0 +1,10 @@
+# Requirements file, to install them execute into
+# virtual environment the command:
+# $ pip install -r requirements.txt
+jupyter
+pandas
+numpy
+beautifulsoup4
+requests
+tabula-py
+selenium

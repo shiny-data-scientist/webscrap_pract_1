@@ -4,3 +4,11 @@
 /.idea/
 # notebook cache
 /notebooks/.ipynb_checkpoints/
+# page content downloaded by selenium
+/data/page_content.html
+/data/page_selenium.html
+# debug log i
+/notebooks/debug.log
+# google driver
+/scripts/chromedriver_win32.zip
+/scripts/chromedriver.exe

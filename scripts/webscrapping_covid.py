@@ -116,7 +116,7 @@ def webscraping(output_path_dataframe: str = None, output_path_pdfs: str = None)
                             comunidad['casos_notificados'] = level_1_element[
                                 i + 1]['text'].split(' ')[1]
 
-                        else :
+                        else:
                             comunidad['casos'] = level_1_element[i + 1]['text']
                             comunidad['casos_notificados'] = level_1_element[i + 2]['text']
 

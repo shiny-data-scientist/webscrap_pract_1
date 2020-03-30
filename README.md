@@ -26,7 +26,7 @@ dependencias que se encuentran en el fichero requirements.txt. Para instalarlas,
     ````
 Ahora puedes ejecutar jupyter en local o simplemente probar el script en la carpeta scrips con el comando:
 ````shell script
-$ python scripts/script_webscrapping.py
+$ python webscrapping_covid.py
 ````
 
 # Ejecutando notebook con selenium

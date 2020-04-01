@@ -27,7 +27,6 @@ def get_page_data_by_city(paths: list):
 
     # Se añaden 3 índices de calidad del aire. PM10, O3 y NO2
     df = pd.DataFrame()
-    data = []
     for path in paths:
         current_path = base_path + path
         driver.get(current_path)
@@ -60,7 +59,9 @@ def get_page_data_by_city(paths: list):
             'no2':
                 '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[3]',
         }
+
         for key, value in mapping_particulas.items():
+            data = [] # datos para cada partícula
             # buscamos partícula por el xpath
             particula = driver.find_element_by_xpath(
                 value
@@ -97,7 +98,7 @@ def get_page_data_by_city(paths: list):
                         )
                         and
                         (
-                                year == '2020' or year == '2019'
+                         year == '2020' or year == '2019'
                         )
                 ):
                     month = None
@@ -117,15 +118,21 @@ def get_page_data_by_city(paths: list):
                                     day += 1
                                     temp_data.update({
                                         'timestamp': timestamp,
-                                        key: rect.text,
-                                        'ciudad': path.split('/')[-2]
+                                        key: rect.text
                                     })
                                     data.append(temp_data)
+            df_temp = pd.DataFrame(data)
+            if df.empty:
+                df = df_temp
+                # FIXME: tengo que gestionar bien la ciudad cuando haya más
+                df['ciudad'] = path.split('/')[-2]
+            else:
+                df = df.join(df_temp.set_index('timestamp'), on='timestamp')
     # print(data)
     from pprint import pprint
     # pprint(data)
     driver.close()
-    df = pd.DataFrame(data, columns=['timestamp', 'ciudad', 'pm10', 'o3', 'no2'])
+    # df = pd.DataFrame(data, columns=['timestamp', 'ciudad', 'pm10', 'o3', 'no2'])
     # crear dataframe y hacer un merge on timestamp and city
     df.to_csv('../data/air_contamination.csv', index=False)
 

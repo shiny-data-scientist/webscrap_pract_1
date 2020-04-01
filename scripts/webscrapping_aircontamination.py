@@ -21,13 +21,13 @@ def get_page_data_by_city(paths: list):
     base_path = 'https://aqicn.org/city/'
 
     # Initialize the drive and hides it.
-    driver = webdriver.Chrome(executable_path='./')
+    driver = webdriver.Chrome()
     # executable_path: argumento para seleccionar el driver
-    # driver.set_window_position(-10000, 0)
+    driver.set_window_position(-10000, 0)
 
     # Se añaden 3 índices de calidad del aire. PM10, O3 y NO2
+    df = pd.DataFrame()
     data = []
-    temp_data = {}
     for path in paths:
         current_path = base_path + path
         driver.get(current_path)
@@ -50,14 +50,18 @@ def get_page_data_by_city(paths: list):
             except:
                 time.sleep(10)
 
+        # El siguiente mapping apunta a cada xpath de cada una de las
+        # partículas
         mapping_particulas = {
-            'pm10': '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[1]',
-            'o3': '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[2]',
-            'no2': '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[3]',
+            'pm10':
+                '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[1]',
+            'o3':
+                '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[2]',
+            'no2':
+                '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[3]',
         }
         for key, value in mapping_particulas.items():
-
-            # buscamos partícula pm10 por el xpath
+            # buscamos partícula por el xpath
             particula = driver.find_element_by_xpath(
                 value
             )
@@ -66,7 +70,6 @@ def get_page_data_by_city(paths: list):
             # Comprobamos si existe la página
             try:
                 table = driver.find_element_by_class_name('squares')
-                print(table)
             except:
                 print(f'Ha habido un error para generar los datos en la página:'
                       f'path: {current_path}, partícula: indice')
@@ -79,7 +82,6 @@ def get_page_data_by_city(paths: list):
             table_data = soup.find(
                 id='historic-aqidata-inner'
             ).find('table').find('tbody')
-
             for row in table_data.find_all('tr'):
                 # cuando el dato está lleno tiene table-row
                 # el year-divider es para el relleno de la tabla
@@ -89,9 +91,9 @@ def get_page_data_by_city(paths: list):
                 # revisar si entra en el siguiente:
                 if (
                         (
-                        row['style'] == 'display: table-row;'
-                        and
-                        row.get('class') != ['year-divider']
+                                row['style'] == 'display: table-row;'
+                                and
+                                row.get('class') != ['year-divider']
                         )
                         and
                         (
@@ -100,7 +102,6 @@ def get_page_data_by_city(paths: list):
                 ):
                     month = None
                     for td in row.find_all('td'):
-                        print(td)
                         if month is None:
                             month = row.td.text
                         if td.get('class') == ['squares']:
@@ -108,6 +109,7 @@ def get_page_data_by_city(paths: list):
                             day = 1
                             for svg in td.find_all('svg'):
                                 for rect in svg.find_all('text'):
+                                    temp_data = {}
                                     timestamp = datetime.strptime(
                                         f'{day}-{month}-{year}',
                                         '%d-%b-%Y'
@@ -118,19 +120,18 @@ def get_page_data_by_city(paths: list):
                                         key: rect.text,
                                         'ciudad': path.split('/')[-2]
                                     })
-                                    # print(temp_data)
                                     data.append(temp_data)
-            # break
-    print(data)
-    df = pd.DataFrame(data)
-    return df
-    print(df)
-
-
-            #  [ ] Añadir una opción para extraer los datos por fechas (las
-            #  recibimos por parámetros)
-
+    # print(data)
+    from pprint import pprint
+    # pprint(data)
     driver.close()
+    df = pd.DataFrame(data, columns=['timestamp', 'ciudad', 'pm10', 'o3', 'no2'])
+    # crear dataframe y hacer un merge on timestamp and city
+    df.to_csv('../data/air_contamination.csv', index=False)
+
+    # TODO:
+    #  [ ] Añadir una opción para extraer los datos por fechas (las
+    #  recibimos por parámetros)
 
 if __name__ == '__main__':
     get_page_data_by_city(['spain/catalunya/barcelona/'])

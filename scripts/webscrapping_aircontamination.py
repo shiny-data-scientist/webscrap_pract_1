@@ -139,6 +139,8 @@ def get_page_data_by_city(paths: list):
     # TODO:
     #  [ ] Añadir una opción para extraer los datos por fechas (las
     #  recibimos por parámetros)
+    #  [ ] Añadir una clasificación de las partículas basada en la página que
+    #  se han extraído los datos.
 
 if __name__ == '__main__':
     get_page_data_by_city(['spain/catalunya/barcelona/'])

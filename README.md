@@ -39,10 +39,14 @@ Puedes descargarlo en el siguiente enlace:
 
 [x] Análisis páginas y primera extracción
 
-[x] Script página gobierno
+[x] Script página gobierno: 
+https://www.isciii.es/QueHacemos/Servicios/VigilanciaSaludPublicaRENAVE/EnfermedadesTransmisibles/Paginas/InformesCOVID-19.aspx 
+(scripts/webscrapping_covid.py)
+
+[x] Script página contaminación del aire: https://aqicn.org/city/ (scripts/webscrapping_aircontamination.py)
 
 [ ] Analizar los links a usar para las diferentes comunidades o ciudades (para extraer datos de contaminación)
 
 [ ] Script que extraiga de forma automática las páginas de todas las comunidades autonómas y/o ciudades.
 
-[ ] Integrar los datos de la contaminación de las dos partículas
+[x] Integrar los datos de la contaminación de las partículas en un mismo dataframe

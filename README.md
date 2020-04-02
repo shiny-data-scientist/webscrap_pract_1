@@ -51,6 +51,8 @@ https://www.isciii.es/QueHacemos/Servicios/VigilanciaSaludPublicaRENAVE/Enfermed
 
 [x] Script página contaminación del aire: https://aqicn.org/city/ (scripts/webscrapping_aircontamination.py)
 
+[ ] Añadir la clasificación de las partículas de contaminación en la recolección de los datos.
+
 [ ] Analizar los links a usar para las diferentes comunidades o ciudades (para extraer datos de contaminación)
 
 [ ] Script que extraiga de forma automática las páginas de todas las comunidades autonómas y/o ciudades.

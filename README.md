@@ -24,16 +24,22 @@ dependencias que se encuentran en el fichero requirements.txt. Para instalarlas,
     ````shell script
      $ pip install -r requirements.txt
     ````
-Ahora puedes ejecutar jupyter en local o simplemente probar el script en la carpeta scrips con el comando:
-````shell script
-$ python webscrapping_covid.py
-````
 
-# Ejecutando notebook con selenium
-
-El notebook que utiliza selenium necesita tener el driver en el directiorio de notebooks.
+Para ejecutar el script que recoge los datos de contaminación del arire es necesario tener descargado el chrome driver
+ya que es la página objetivo solo muestras los datos históricos cuando se interactúa con ella. Por lo tanto, es 
+necesario tenerlo descargado previamente. Por ahora es necesario tenerlo en el mismo directorio desde el cual se 
+ejecute (ej. scripts/ para el caso indicado a continuación). 
 Puedes descargarlo en el siguiente enlace:
     https://chromedriver.chromium.org/
+
+Más adelante se añadirá como variable de entorno del sistema para facilitar su gestión.
+
+Ahora puedes ejecutar jupyter en local o simplemente probar el script en la carpeta scrips con el comando:
+````shell script
+$ python scripts/webscrapping_covid.py
+$ python scripts/webscrapping_aircontamination.py
+````
+
     
 # Tareas
 

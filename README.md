@@ -57,4 +57,8 @@ https://www.isciii.es/QueHacemos/Servicios/VigilanciaSaludPublicaRENAVE/Enfermed
 
 [ ] Script que extraiga de forma automática las páginas de todas las comunidades autonómas y/o ciudades.
 
+[ ] Añadir en el dataset comunidad autónoma y ciudad.
+
+[ ] Ordenar el dataset en el formato TimeStamp, CA, Ciudad, partículas (pm10, no2, o3) 
+
 [x] Integrar los datos de la contaminación de las partículas en un mismo dataframe

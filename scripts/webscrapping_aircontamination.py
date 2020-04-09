@@ -9,13 +9,41 @@ import time
 from datetime import datetime
 
 
-def get_page_data_by_city(paths: list):
+def aqi_air_pollution_level(aqi_level: int):
+    """"
+    Returns the label that indicates the air pollution level.
+    """
+    if aqi_level < 51:
+        return 'Good'
+    elif aqi_level > 50 and aqi_level < 101:
+        return 'Moderate'
+    elif aqi_level > 100 and aqi_level < 151:
+        return 'Unhealthy for Sensitive Groups'
+    elif aqi_level > 150 and aqi_level < 201:
+        return 'Unhealthy'
+    elif aqi_level > 200 and aqi_level < 301:
+        return 'Very Unhealthy'
+    elif aqi_level > 301:
+        return 'Hazardous'
+
+
+def int_or_none(x: str):
+    """
+    Returns int or None from str.
+    """
+    try:
+        return int(x)
+    except:
+        return None
+
+
+def get_page_data_by_city(paths: dict):
     """
     Recoge los datos de la calidad del aire de la página
     https://aqicn.org/city/
     Utiliza selenium para interactuar con la página y que muestre los datos
     de interés.
-    :param paths: list of paths to get the data
+    :param paths: dictionaries of paths to get the data
     :return: None
     """
     base_path = 'https://aqicn.org/city/'
@@ -27,8 +55,8 @@ def get_page_data_by_city(paths: list):
 
     # Se añaden 3 índices de calidad del aire. PM10, O3 y NO2
     df = pd.DataFrame()
-    for path in paths:
-        current_path = base_path + path
+    for link, location in paths.items():
+        current_path = base_path + link
         driver.get(current_path)
         # busca el historic data block y espera unos segundos para que se
         # muestren los datos objetivo.
@@ -59,7 +87,7 @@ def get_page_data_by_city(paths: list):
             'no2':
                 '//*[@id="historic-aqidata-inner"]/div[2]/div[2]/center/ul/li[3]',
         }
-
+        df_specific_city = pd.DataFrame()
         for key, value in mapping_particulas.items():
             data = [] # datos para cada partícula
             # buscamos partícula por el xpath
@@ -118,29 +146,89 @@ def get_page_data_by_city(paths: list):
                                     day += 1
                                     temp_data.update({
                                         'timestamp': timestamp,
-                                        key: rect.text
+                                        key: int_or_none(rect.text)
                                     })
                                     data.append(temp_data)
-            df_temp = pd.DataFrame(data)
-            if df.empty:
-                df = df_temp
-                # FIXME: tengo que gestionar bien la ciudad cuando haya más
-                df['ciudad'] = path.split('/')[-2]
-            else:
-                df = df.join(df_temp.set_index('timestamp'), on='timestamp')
-    # print(data)
-    from pprint import pprint
-    # pprint(data)
-    driver.close()
-    # df = pd.DataFrame(data, columns=['timestamp', 'ciudad', 'pm10', 'o3', 'no2'])
-    # crear dataframe y hacer un merge on timestamp and city
-    df.to_csv('../data/air_contamination.csv', index=False)
 
-    # TODO:
-    #  [ ] Añadir una opción para extraer los datos por fechas (las
-    #  recibimos por parámetros)
-    #  [ ] Añadir una clasificación de las partículas basada en la página que
-    #  se han extraído los datos.
+            # Gets the air pollution label
+            df_temp = pd.DataFrame(data)
+            new_label = key + '_level'
+            df_temp[new_label] = df_temp[key].apply(
+                aqi_air_pollution_level
+            )
+            if df_specific_city.empty:
+                df_specific_city = df_temp
+                # FIXME: tengo que gestionar bien la ciudad cuando haya más
+                df_specific_city['ciudad'] = location['ciudad']
+                df_specific_city['ca'] = location['ca']
+            else:
+                df_specific_city = df_specific_city.join(
+                    df_temp.set_index('timestamp'), on='timestamp'
+                )
+
+        # joins the dataframe with all the particules:
+        print(f'Extrayendo los datos de la ciudad {location}')
+        if df.empty:
+            df = df_specific_city
+            del df_specific_city
+        else:
+            print(df_specific_city.head(2))
+            print(df.head(2))
+            df = df.append(df_specific_city, ignore_index=True)
+            del df_specific_city
+
+    driver.close()
+
+    columns_order = [
+        'timestamp', 'ca', 'ciudad',
+        'pm10', 'pm10_level', 'o3',
+        'o3_level', 'no2', 'no2_level'
+    ]
+    # crear dataframe y hacer un merge on timestamp and city
+    df.to_csv(
+        '../data/air_contamination.csv',
+        index=False, columns=columns_order
+    )
+
 
 if __name__ == '__main__':
-    get_page_data_by_city(['spain/catalunya/barcelona/'])
+    links_to_scrap = {
+        'spain/andalucia/sevilla/santa-clara/': {
+            'ca': 'Andalucia', 'ciudad': 'Sevilla'
+        },
+        'spain/catalunya/barcelona/': {
+            'ca': 'Catalunya', 'ciudad': 'Barcelona'
+        },
+        'madrid/': {
+            'ca': 'Madrid', 'ciudad': 'Madrid'
+        },
+        'spain/valencia/valencia/pista-de-silla/': {
+            'ca': 'Valencia', 'ciudad': 'Valencia'},
+        'spain/galicia/vigo/coia/': {
+            'ca': 'Galicia', 'ciudad': 'Vigo'},
+        'spain/castilla-y-leon/valladolid/vega-sicilia/': {
+            'ca': 'Castilla y León',
+            'ciudad': 'Valladolid'
+        },
+        'spain/pais-vasco/bilbao/mazarredo/': {
+            'ca': 'Pais Vasco', 'ciudad': 'Bilbao'},
+        'spain/canarias/san-nicolas/': {
+            'ca': 'Canarias', 'ciudad': 'Las Palmas de Gran Canaria'},
+        'spain/murcia/san-basilio-murcia-ciudad/': {
+            'ca': 'Murcia', 'ciudad': 'Murcia'},
+        'spain/zaragoza/el-picarral/': {
+            'ca': 'Aragon', 'ciudad': 'Zaragoza'
+        },
+        'spain/baleares/foners/': {
+            'ca': 'Islas Baleares', 'ciudad': 'Palma'
+        },
+        'spain/navarra/pamplona/rotxapea/': {
+            'ca': 'Navarra', 'ciudad': 'Pamplona'
+        },
+        'spain/cantabria/santander-centro/': {
+            'ca': 'Cantabria',
+            'ciudad': 'Santander'
+        }
+    }
+
+    get_page_data_by_city(links_to_scrap)

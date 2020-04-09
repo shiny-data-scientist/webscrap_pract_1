@@ -173,19 +173,23 @@ def get_page_data_by_city(paths: dict):
             del df_specific_city
         else:
             print(df_specific_city.head(2))
-            df = df.join(
-                df_specific_city.set_index('timestamp'), on='timestamp'
-            )
+            print(df.head(2))
+            df = df.append(df_specific_city, ignore_index=True)
             del df_specific_city
 
     driver.close()
-    # df = pd.DataFrame(data, columns=['timestamp', 'ciudad', 'pm10', 'o3', 'no2'])
-    # crear dataframe y hacer un merge on timestamp and city
-    df.to_csv('../data/air_contamination.csv', index=False)
 
-    # TODO:
-    #  [ ] Añadir una opción para extraer los datos por fechas (las
-    #  recibimos por parámetros)
+    columns_order = [
+        'timestamp', 'ca', 'ciudad',
+        'pm10', 'pm10_level', 'o3',
+        'o3_level', 'no2', 'no2_level'
+    ]
+    # crear dataframe y hacer un merge on timestamp and city
+    df.to_csv(
+        '../data/air_contamination.csv',
+        index=False, columns=columns_order
+    )
+
 
 if __name__ == '__main__':
     links_to_scrap = {

@@ -39,26 +39,3 @@ Ahora puedes ejecutar jupyter en local o simplemente probar el script en la carp
 $ python scripts/webscrapping_covid.py
 $ python scripts/webscrapping_aircontamination.py
 ````
-
-    
-# Tareas
-
-[x] Análisis páginas y primera extracción
-
-[x] Script página gobierno: 
-https://www.isciii.es/QueHacemos/Servicios/VigilanciaSaludPublicaRENAVE/EnfermedadesTransmisibles/Paginas/InformesCOVID-19.aspx 
-(scripts/webscrapping_covid.py)
-
-[x] Script página contaminación del aire: https://aqicn.org/city/ (scripts/webscrapping_aircontamination.py)
-
-[x] Añadir la clasificación de las partículas de contaminación en la recolección de los datos.
-
-[x] Analizar los links a usar para las diferentes comunidades o ciudades (para extraer datos de contaminación)
-
-[x] Script que extraiga de forma automática las páginas de todas las comunidades autonómas y/o ciudades.
-
-[x] Añadir en el dataset comunidad autónoma y ciudad.
-
-[x] Ordenar el dataset en el formato TimeStamp, CA, Ciudad, partículas (pm10, o3, no2) 
-
-[x] Integrar los datos de la contaminación de las partículas en un mismo dataframe

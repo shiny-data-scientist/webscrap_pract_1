@@ -1,11 +1,12 @@
 # README
 
-Este repositorio contiene cuatro directiorios: 
+Este repositorio contiene cinco directiorios: 
 
  - data: Se encuentran los ficheros generados con los scripts.
  - scripts: Los scripts para extraer los dataframes.
  - notebooks: Notebooks donde se realiza un primer análisis de las páginas objetivo para extraer sus datos.
  - robots: Los ficheros robots.txt de las páginas objetivo.
+ - pdf_respuestas: Fichero PDF con las respuestas a la práctica.
  
 Para ejecutar los diferentes scripts o notebooks de este repositorio es necesario instalar las 
 dependencias que se encuentran en el fichero requirements.txt. Para instalarlas, sigo los sigueintes pasos:

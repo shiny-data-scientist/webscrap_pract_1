@@ -158,7 +158,7 @@ def get_page_data_by_city(paths: dict):
             )
             if df_specific_city.empty:
                 df_specific_city = df_temp
-                # FIXME: tengo que gestionar bien la ciudad cuando haya más
+                # Añadimos ciudad y comunidad autónoma
                 df_specific_city['ciudad'] = location['ciudad']
                 df_specific_city['ca'] = location['ca']
             else:
@@ -192,6 +192,8 @@ def get_page_data_by_city(paths: dict):
 
 
 if __name__ == '__main__':
+    # generamos un diccionario con los links a extraer y sus comunidades
+    # autónomas y ciudades
     links_to_scrap = {
         'spain/andalucia/sevilla/santa-clara/': {
             'ca': 'Andalucia', 'ciudad': 'Sevilla'
